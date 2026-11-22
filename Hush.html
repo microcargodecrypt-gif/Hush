@@ -1013,8 +1013,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   "use strict";
   const C = global.CONFIG;
 
-  // When two detections overlap, the type listed first wins.
-  const PRIORITY = ["national_id", "credit_card", "bank_account", "vat_number", "email", "online_profile",
+  // When two detections overlap, the type listed first wins. Bank accounts come first because
+  // the digits inside a valid IBAN can also pass the card or national ID checks.
+  const PRIORITY = ["bank_account", "national_id", "credit_card", "vat_number", "email", "online_profile",
     "ip_address", "date_of_birth", "phone", "address", "person_name", "postal_code_city", "money_amount",
     "age", "gender", "nationality", "marital_status"];
   const prio = id => { const i = PRIORITY.indexOf(id); return i < 0 ? 99 : i; };
@@ -1028,6 +1029,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   }).replace(/ /g, "[ \\t]+");
 
   const STOP = new Set(C.nameStopwords.map(norm));
+  // A listed first name is never a stopword, even if it matches one without accents ("Marie" vs "marié").
+  const FIRST_LC = new Set(C.firstNames.map(n => n.toLowerCase()));
+  const isStop = w => STOP.has(norm(w).replace(/[.]/g, "")) && !FIRST_LC.has(String(w).toLowerCase());
   const CITIES = new Set(C.belgianCities.map(norm));
   const PARTICLES = ["van", "de", "der", "den", "von", "le", "la", "du", "da", "di", "del", "des", "ter", "ten", "vanden", "vander", "vande"];
   const PARTICLE_SET = new Set(PARTICLES);
@@ -1139,11 +1143,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
   function cleanName(s) {
     let words = String(s).replace(/[,;:()]+$/, "").trim().split(/[ \t]+/).filter(Boolean);
-    const bad = w => STOP.has(norm(w)) || PARTICLE_SET.has(norm(w));
+    const bad = w => isStop(w) || PARTICLE_SET.has(norm(w));
     while (words.length && bad(words[words.length - 1])) words.pop();
-    while (words.length && STOP.has(norm(words[0]))) words.shift();
+    while (words.length && isStop(words[0])) words.shift();
     if (!words.length) return null;
-    if (words.some(w => STOP.has(norm(w).replace(/[.]/g, "")) || /\d/.test(w))) return null;
+    if (words.some(w => isStop(w) || /\d/.test(w))) return null;
     const name = words.join(" ");
     if (name.replace(/[^\p{L}]/gu, "").length < 3) return null;
     return name;
@@ -1155,7 +1159,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     addKnown(ctx, full, "person_name", key, false);
     for (const w of full.split(/[ \t]+/)) {
       const n = norm(w).replace(/[.]/g, "");
-      if (n.length < 3 || PARTICLE_SET.has(n) || STOP.has(n) || COMMON.has(n)) continue;
+      if (n.length < 3 || PARTICLE_SET.has(n) || isStop(w) || COMMON.has(n)) continue;
       addKnown(ctx, w, "person_name", key, true);
     }
   }
@@ -1352,6 +1356,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const fmtSize = b => b < 1024 ? b + " B" : b < 1048576 ? (b / 1024).toFixed(0) + " KB" : (b / 1048576).toFixed(1) + " MB";
   const tick = () => new Promise(r => setTimeout(r, 0));
+  // Read text files as UTF-8 (with or without a BOM). Files that are not valid UTF-8 are read as Windows-1252.
+  function decodeText(buf) {
+    try { return new TextDecoder("utf-8", { fatal: true }).decode(buf); }
+    catch (e) { return new TextDecoder("windows-1252").decode(buf); }
+  }
 
   /* ---------- settings panel ---------- */
   function renderLevels() {
@@ -1489,7 +1498,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   }
 
   async function processTxt(file, ctx) {
-    const text = new TextDecoder("utf-8").decode(await file.arrayBuffer());
+    const text = decodeText(await file.arrayBuffer());
     const { out, pv } = anonymizePages([text], ctx, "text", { cvHeuristic: true });
     if (ctx.scan) return {};
     return { blob: new Blob([out[0]], { type: "text/plain;charset=utf-8" }), preview: pv };
@@ -1516,7 +1525,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     return pages;
   }
   const pdfSafe = s => s.replace(/[‘’‚′]/g, "'").replace(/[“”„″]/g, '"').replace(/[–—−]/g, "-").replace(/[•●▪■◦·]/g, "-")
-    .replace(/…/g, "...").replace(/€/g, "EUR").replace(/\u00a0/g, " ").replace(/[^\x09\x0A\x20-\x7E\xA0-\xFF]/g, "?");
+    .replace(/…/g, "...").replace(/€/g, "EUR").replace(/œ/g, "oe").replace(/Œ/g, "OE").replace(/æ/g, "ae").replace(/Æ/g, "AE")
+    .replace(/ﬁ/g, "fi").replace(/ﬂ/g, "fl").replace(/\u00a0/g, " ").replace(/[^\x09\x0A\x20-\x7E\xA0-\xFF]/g, "?");
   function buildPdf(pages, sourceName) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: "pt", format: "a4" });
@@ -1613,7 +1623,15 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
   /* ---------- Excel / CSV ---------- */
   async function processSheet(file, ctx, ext) {
-    const wb = XLSX.read(await file.arrayBuffer(), { type: "array", cellNF: true, dense: false });
+    // CSV: decode the text ourselves (so accents and € survive without a BOM) and keep every value
+    // exactly as written (raw), so dates and numbers are not reformatted.
+    const csvText = ext === "csv" ? decodeText(await file.arrayBuffer()) : null;
+    // keep the file's own separator (Belgian Excel often saves CSV with ";")
+    const firstLine = csvText ? csvText.slice(0, csvText.indexOf("\n") + 1 || undefined) : "";
+    const sep = [";", "\t", ","].map(c => [c, firstLine.split(c).length]).sort((a, b) => b[1] - a[1])[0][0];
+    const wb = ext === "csv"
+      ? XLSX.read(csvText, { type: "string", raw: true, dense: false, FS: sep })
+      : XLSX.read(await file.arrayBuffer(), { type: "array", cellNF: true, dense: false });
     const plan = [];
     const textParts = [];
     for (const sn of wb.SheetNames) {
@@ -1672,7 +1690,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     if (ctx.scan) return {};
     if (first) pv.after = XLSX.utils.sheet_to_json(first.ws, { header: 1, raw: false, defval: "" }).slice(0, 12).map(r => r.slice(0, 9));
     const bookType = ext === "csv" ? "csv" : ext === "xls" ? "biff8" : "xlsx";
-    const data = XLSX.write(wb, { bookType, type: "array" });
+    const data = ext === "csv" ? "\ufeff" + XLSX.write(wb, { bookType, type: "string", FS: sep }) : XLSX.write(wb, { bookType, type: "array" });
     const mime = ext === "csv" ? "text/csv;charset=utf-8" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     const rows = plan.reduce((n, p) => n + Math.max(0, p.rg.e.r - p.headerRow), 0);
     return { blob: new Blob([data], { type: mime }), preview: pv, note: `${rows.toLocaleString()} rows processed. Cell formatting is not kept in this version.` };
