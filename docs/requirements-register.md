@@ -77,3 +77,4 @@ Of 35 requirements, 17 were delivered in MVP1 and 2 partly, 2 have been delivere
 | 30 Oct 2026 | Register created: 17 delivered, 2 partial, 7 parked for MVP2, 7 to decide. This version is the MVP1 snapshot. |
 | 22 Nov 2026 | Reworded as a general-purpose tool ahead of open-sourcing. No requirement changed. |
 | 22 Nov 2026 | Added R-34 (guided tour) and R-35 (data list after upload, with counts), both delivered. New status: Delivered (MVP2). |
+| 22 Nov 2026 | Bug fixes, no requirement changed: IBANs no longer partly removed as card numbers; CSV files without a BOM keep accents and €; CSV dates and separators kept as written; "Marie" recognised as a first name; œ kept as "oe" in PDF output. |
