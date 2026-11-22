@@ -1,0 +1,13 @@
+Hush (local anonymizer)
+Copyright 2026 The Hush contributors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Hush.html bundles third-party software under its own licences:
+- SheetJS Community Edition 0.18.5, Copyright (C) 2012-present SheetJS LLC (Apache-2.0)
+- PDF.js 3.11.174, Copyright 2023 Mozilla Foundation (Apache-2.0)
+- jsPDF 2.5.1, Copyright (c) 2010-2021 James Hall and contributors (MIT)
+- JSZip 3.10.1, Copyright (c) 2009-2016 Stuart Knightley and contributors (MIT)
+- pako, Copyright (C) 2014-2017 Vitaly Puzrin and Andrei Tupitcin (MIT and zlib)
+
+Full notices are in THIRD_PARTY_NOTICES.md.

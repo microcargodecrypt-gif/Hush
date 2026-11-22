@@ -1,0 +1,22 @@
+name: Feature request
+description: Suggest a new capability or an improvement.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Please check docs/requirements-register.md first. Many ideas are already listed as parked or to decide.
+  - type: textarea
+    id: need
+    attributes:
+      label: What do you need, and why
+    validations:
+      required: true
+  - type: input
+    id: ref
+    attributes:
+      label: Related requirement ID, if any
+      placeholder: e.g. R-27
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea for a solution

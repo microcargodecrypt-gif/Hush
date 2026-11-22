@@ -1,0 +1,21 @@
+# OS and editor clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
+
+# Never commit real documents. Keep test files in a local folder outside the repo,
+# or in one of these ignored folders.
+/private/
+/input/
+/output/
+/anonymized/
+*_anonymized.*
+audit_log*.csv
+anonymized*.zip
+
+# Office lock files
+~$*

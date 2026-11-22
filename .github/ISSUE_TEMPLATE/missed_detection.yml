@@ -1,0 +1,54 @@
+name: Missed or wrong detection
+description: Personal data was not anonymized, or something that is not personal data was.
+labels: ["detection"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste real personal data here.** Replace every real name, address and number with a made-up one that shows the same problem.
+  - type: textarea
+    id: snippet
+    attributes:
+      label: Made-up example
+      description: A short fictional snippet that reproduces the problem.
+      render: text
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What went wrong
+      options:
+        - Personal data was missed
+        - Something was anonymized that should not have been
+        - Wrong data type or wrong method applied
+    validations:
+      required: true
+  - type: dropdown
+    id: filetype
+    attributes:
+      label: File type
+      options: [Word (.docx), PDF, Excel (.xlsx/.xls), CSV, Plain text]
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      options: [English, French, Dutch, Other]
+  - type: dropdown
+    id: level
+    attributes:
+      label: Level
+      options: [Low, Medium, High, Very high]
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+  - type: checkboxes
+    id: noreal
+    attributes:
+      label: Check
+      options:
+        - label: My example contains no real personal data.
+          required: true
