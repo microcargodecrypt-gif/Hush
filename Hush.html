@@ -359,6 +359,37 @@ details summary { cursor: pointer; font-weight: 650; font-size: 16px; }
 details summary span { color: var(--muted); font-weight: 400; font-size: 14px; margin-left: 6px; }
 details[open] summary { margin-bottom: 4px; }
 .foot { text-align: center; color: var(--muted); font-size: 12.5px; padding: 0 16px 32px; }
+/* found / not found in the added files */
+.ent-count { justify-self: end; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ent-count:not(:empty) { padding: 0 7px; border-radius: 999px; border: 1px solid var(--line); }
+.ent.found .ent-count { color: var(--accent); background: var(--accent-soft); border-color: transparent; font-weight: 600; }
+.ent.absent label, .ent.absent .ent-count { opacity: .5; }
+.ent.absent select { opacity: .35; }
+.ent-empty { margin: 0; padding: 14px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); font-size: 13.5px; }
+.scan-status { margin: -4px 0 10px; font-size: 13px; color: var(--muted); }
+.scan-status b { color: var(--ink); font-weight: 600; }
+
+/* header actions */
+.top-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.tour-link { border: 0; background: none; padding: 6px 4px; color: var(--accent); font-weight: 600; font-size: 13.5px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+/* guided tour */
+.tour { position: fixed; inset: 0; z-index: 1000; }
+.tour-spot { position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(8, 12, 20, .58); outline: 3px solid var(--accent); outline-offset: 0;
+  pointer-events: none; transition: top .25s, left .25s, width .25s, height .25s; }
+.tour-pop { position: fixed; width: min(340px, calc(100vw - 24px)); background: var(--surface); color: var(--ink); border-radius: 12px;
+  padding: 18px 18px 14px; box-shadow: 0 12px 40px rgba(0, 0, 0, .3); transition: top .25s, left .25s; }
+.tour-arrow { position: absolute; width: 16px; height: 16px; background: var(--surface); transform: rotate(45deg); }
+.tour-step { margin: 0 0 4px; font-size: 12px; font-weight: 600; color: var(--accent); letter-spacing: .02em; }
+.tour-pop h3 { margin: 0 0 6px; font-size: 17px; font-weight: 650; }
+.tour-text { margin: 0 0 14px; font-size: 14px; color: var(--muted); }
+.tour-btns { display: flex; align-items: center; gap: 8px; }
+.tour-btns .grow { flex: 1; }
+.tour-skip { border: 0; background: none; padding: 6px 2px; color: var(--muted); font-size: 13.5px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.tour-dots { display: flex; gap: 5px; margin-right: 4px; }
+.tour-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--line); }
+.tour-dots span.on { background: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .tour-spot, .tour-pop { transition: none; } }
 [hidden] { display: none !important; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -384,22 +415,33 @@ details[open] summary { margin-bottom: 4px; }
       <p class="sub">Remove personal data from your documents before they go into an AI tool.</p>
     </div>
   </div>
-  <div class="offline" title="This page is blocked from making any network request. Everything is processed inside this browser tab."><span class="dot"></span>Offline: files never leave this computer</div>
+  <div class="top-right">
+    <button class="tour-link" id="tourBtn" type="button">Show me around</button>
+    <div class="offline" title="This page is blocked from making any network request. Everything is processed inside this browser tab."><span class="dot"></span>Offline: files never leave this computer</div>
+  </div>
 </header>
 
 <main class="layout">
   <aside class="panel settings" aria-label="Anonymization settings">
-    <h2>Anonymization level</h2>
-    <div class="levels" id="levels" role="radiogroup" aria-label="Anonymization level"></div>
-    <div class="level-meter" id="meter" aria-hidden="true"></div>
-    <p class="level-text" id="levelText"></p>
-    <h2>What gets anonymized</h2>
-    <p class="hint">The level sets the defaults. You can still tick types on or off and pick how each one is replaced.</p>
-    <div id="entityList"></div>
-    <div class="methods-help">
-      <p><b>Remove</b> deletes the value.</p>
-      <p><b>Mask</b> hides most of it: s***@g***.com</p>
-      <p><b>Pseudonymize</b> swaps it for a label such as [PERSON_1], used for the same person throughout one file.</p>
+    <div id="levelBox">
+      <h2>Anonymization level</h2>
+      <div class="levels" id="levels" role="radiogroup" aria-label="Anonymization level"></div>
+      <div class="level-meter" id="meter" aria-hidden="true"></div>
+      <p class="level-text" id="levelText"></p>
+    </div>
+    <div id="entityBox">
+      <h2>What gets anonymized</h2>
+      <p class="ent-empty" id="entityEmpty">Add a file and this list will show which kinds of personal data Hush found in it.</p>
+      <div id="entityWrap" hidden>
+        <p class="hint">The level sets the defaults. You can still tick types on or off and pick how each one is replaced. The number shows how often each type was found. Types not found in your files are greyed out.</p>
+        <p class="scan-status" id="scanStatus" aria-live="polite"></p>
+        <div id="entityList"></div>
+        <div class="methods-help">
+          <p><b>Remove</b> deletes the value.</p>
+          <p><b>Mask</b> hides most of it: s***@g***.com</p>
+          <p><b>Pseudonymize</b> swaps it for a label such as [PERSON_1], used for the same person throughout one file.</p>
+        </div>
+      </div>
     </div>
   </aside>
 
@@ -468,6 +510,23 @@ details[open] summary { margin-bottom: 4px; }
   </section>
 </main>
 <p class="foot">MVP. Detection is rule-based, so review the output before sharing it.</p>
+
+<div class="tour" id="tour" hidden>
+  <div class="tour-spot" id="tourSpot"></div>
+  <div class="tour-pop" id="tourPop" role="dialog" aria-modal="true" aria-labelledby="tourTitle" aria-describedby="tourText">
+    <div class="tour-arrow" id="tourArrow"></div>
+    <p class="tour-step" id="tourStep"></p>
+    <h3 id="tourTitle"></h3>
+    <p class="tour-text" id="tourText"></p>
+    <div class="tour-btns">
+      <button class="tour-skip" id="tourSkip" type="button">Skip tour</button>
+      <span class="grow"></span>
+      <div class="tour-dots" id="tourDots" aria-hidden="true"></div>
+      <button class="btn small" id="tourBack" type="button">Back</button>
+      <button class="btn small primary" id="tourNext" type="button">Next</button>
+    </div>
+  </div>
+</div>
 
 <script>/*!
 
@@ -1286,7 +1345,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   const SUPPORTED = ["docx", "pdf", "xlsx", "xls", "csv", "txt"];
   const METHOD_LABEL = { removal: "Remove", masking: "Mask", pseudonymization: "Pseudonymize" };
   const LEVELS = Object.keys(C.levels);
-  const state = { files: [], level: C.defaultLevel, enabled: new Set(), methods: {}, results: [], busy: false };
+  const state = { files: [], level: C.defaultLevel, enabled: new Set(), methods: {}, results: [], busy: false, scanning: false };
   for (const [id, e] of Object.entries(C.entities)) state.methods[id] = e.method;
 
   const extOf = n => (n.split(".").pop() || "").toLowerCase();
@@ -1302,13 +1361,28 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     $("#meter").innerHTML = LEVELS.map((_, i) => `<span class="${i <= idx ? "on" : ""}"></span>`).join("");
     $("#levelText").textContent = C.levelInfo[state.level].text;
   }
+  // How many of each type the quick scan found in the added files (null = nothing scanned yet).
+  function foundCounts() {
+    const scanned = state.files.filter(f => f.found);
+    if (!scanned.length) return null;
+    const c = {};
+    for (const f of scanned) for (const [k, v] of Object.entries(f.found)) c[k] = (c[k] || 0) + v;
+    return c;
+  }
   function renderEntities() {
     const ids = Object.keys(C.entities);
+    const has = state.files.length > 0;
+    $("#entityEmpty").hidden = has; $("#entityWrap").hidden = !has;
+    const counts = foundCounts(), done = counts && !state.scanning;
     const row = id => {
       const e = C.entities[id], on = state.enabled.has(id);
-      return `<div class="ent ${on ? "" : "off"}">
+      const n = counts ? counts[id] || 0 : null;
+      const cls = (on ? "" : "off") + (n ? " found" : done ? " absent" : "");
+      const countTxt = n ? n.toLocaleString() : done ? "0" : "";
+      const countTip = n ? `Found ${n.toLocaleString()} time${n > 1 ? "s" : ""} in your files` : done ? "Not found in your files" : "";
+      return `<div class="ent ${cls}">
         <label><input type="checkbox" data-ent="${id}" ${on ? "checked" : ""}>${esc(e.label)}${e.quasi ? '<span class="quasi" title="Quasi-identifier: not identifying alone, but can be in combination">quasi</span>' : ""}</label>
-        <span></span>
+        <span class="ent-count" title="${countTip}">${countTxt}</span>
         <select data-method="${id}" aria-label="Method for ${esc(e.label)}">${Object.keys(METHOD_LABEL).map(m =>
           `<option value="${m}" ${state.methods[id] === m ? "selected" : ""}>${METHOD_LABEL[m]}</option>`).join("")}</select>
       </div>`;
@@ -1346,6 +1420,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     const kinds = [...new Set(skipped)].map(k => "." + k).join(", ");
     notice(skipped.length ? `Skipped ${skipped.length} file${skipped.length > 1 ? "s" : ""} in a format this version doesn't read (${kinds}). Old .doc files can be saved as .docx in Word first.` : "");
     renderFiles();
+    scanFiles();
   }
   function renderFiles() {
     $("#fileListWrap").hidden = !state.files.length;
@@ -1382,7 +1457,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   $("#pickFolder").onclick = () => $("#folderInput").click();
   $("#fileInput").onchange = e => { addFiles(e.target.files); e.target.value = ""; };
   $("#folderInput").onchange = e => { addFiles(e.target.files); e.target.value = ""; };
-  $("#clearBtn").onclick = () => { if (state.busy) return; state.files = []; notice(""); renderFiles(); };
+  $("#clearBtn").onclick = () => { if (state.busy) return; scanToken++; state.scanning = false; state.files = []; notice(""); renderFiles(); renderEntities(); };
 
   /* ---------- text preview helpers ---------- */
   const PREVIEW_LIMIT = 6000;
@@ -1416,6 +1491,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   async function processTxt(file, ctx) {
     const text = new TextDecoder("utf-8").decode(await file.arrayBuffer());
     const { out, pv } = anonymizePages([text], ctx, "text", { cvHeuristic: true });
+    if (ctx.scan) return {};
     return { blob: new Blob([out[0]], { type: "text/plain;charset=utf-8" }), preview: pv };
   }
 
@@ -1466,6 +1542,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     if (pages.join("").replace(/\s/g, "").length < 20)
       return { skipped: "No text layer found. This looks like a scanned PDF; OCR is planned for a later version." };
     const { out, pv } = anonymizePages(pages, ctx, "page", { cvHeuristic: true });
+    if (ctx.scan) return {};
     return { blob: buildPdf(out, file.name), preview: pv, note: "PDF output keeps the text but not the original layout." };
   }
 
@@ -1494,6 +1571,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     }
     A.prepareContext(paras.map(p => p.text).join("\n"), ctx, { cvHeuristic: true });
     const pv = newPreview(); let idx = 0;
+    if (ctx.scan) { for (const para of paras) A.anonymizeSegment(para.text, ctx, ""); return {}; }
     for (const para of paras) {
       idx++;
       const where = para.part === "word/document.xml" ? `paragraph ${idx}` : `${para.part.replace(/^word\/|\.xml$/g, "")} paragraph ${idx}`;
@@ -1591,6 +1669,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         if (r % 500 === 0) await tick();
       }
     }
+    if (ctx.scan) return {};
     if (first) pv.after = XLSX.utils.sheet_to_json(first.ws, { header: 1, raw: false, defval: "" }).slice(0, 12).map(r => r.slice(0, 9));
     const bookType = ext === "csv" ? "csv" : ext === "xls" ? "biff8" : "xlsx";
     const data = XLSX.write(wb, { bookType, type: "array" });
@@ -1604,8 +1683,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   function outName(path) {
     const i = path.lastIndexOf("."); return path.slice(0, i) + "_anonymized" + path.slice(i);
   }
-  async function processOne(f, s) {
+  async function processOne(f, s, scan) {
     const ctx = A.newContext(s, f.path); const ext = extOf(f.file.name);
+    ctx.scan = !!scan;
     let r;
     if (ext === "docx") r = await processDocx(f.file, ctx);
     else if (ext === "pdf") r = await processPdf(f.file, ctx);
@@ -1614,8 +1694,37 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     return { ...r, counts: ctx.counts, log: ctx.log, path: f.path, out: outName(f.path) };
   }
 
+  /* ---------- quick scan: what is in the added files? ---------- */
+  // Runs the same detection with every type switched on, but builds no output file.
+  // It works one file at a time and yields between files, so the page stays responsive.
+  let scanToken = 0;
+  const ALL_TYPES = { enabled: Object.keys(C.entities), methods: Object.fromEntries(Object.keys(C.entities).map(k => [k, "pseudonymization"])) };
+  async function scanFiles() {
+    renderEntities();
+    if (state.busy || state.scanning) return;
+    const token = ++scanToken;
+    state.scanning = true;
+    let todo;
+    while (token === scanToken && (todo = state.files.filter(f => !f.found)).length) {
+      const total = state.files.length, doneN = total - todo.length;
+      if (total > 1) $("#scanStatus").innerHTML = `Checking your files: <b>${doneN + 1} of ${total}</b>`;
+      else $("#scanStatus").textContent = "Checking your file\u2026";
+      renderEntities();
+      await tick();
+      const f = todo[0];
+      try { const ctx = await processOne(f, ALL_TYPES, true); f.found = ctx.counts || {}; }
+      catch (err) { f.found = {}; }
+    }
+    if (token !== scanToken) return;
+    state.scanning = false;
+    const n = state.files.length;
+    $("#scanStatus").textContent = n ? `Counts are for the ${n > 1 ? n + " files" : "file"} you added.` : "";
+    renderEntities();
+  }
+
   $("#runBtn").onclick = async () => {
     if (state.busy || !state.files.length) return;
+    scanToken++; state.scanning = false;
     if (!state.enabled.size) { notice("Tick at least one data type on the left."); return; }
     notice(""); state.busy = true; state.results = []; renderFiles();
     $("#progress").hidden = false; $("#clearBtn").disabled = true;
@@ -1638,6 +1747,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     }
     $("#progressFill").style.width = "100%"; $("#progressText").textContent = `Finished ${n} file${n > 1 ? "s" : ""}`;
     state.busy = false; $("#clearBtn").disabled = false; renderFiles(); renderResults();
+    scanFiles();
   };
 
   /* ---------- results ---------- */
@@ -1733,8 +1843,100 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     $("#zipBtn").disabled = false; $("#zipBtn").textContent = "Download all (.zip)";
   };
 
+  /* ---------- guided tour (first visit, replay with "Show me around") ---------- */
+  const TOUR_KEY = "hush.tourSeen";
+  const TOUR = [
+    { el: "#drop", title: "Add a document",
+      text: "Start by adding a document you want to anonymize. Click Choose files, or drag a file or a whole folder onto this box." },
+    { el: "#levelBox", title: "Choose how much to hide",
+      text: "Pick a level. Low hides only names and addresses. Each step up hides more, and Very high also hides details such as date of birth and age." },
+    { el: "#entityBox", title: "Check what gets hidden",
+      text: "Once you add a file, this list shows what Hush found in it, with a count for each kind. Kinds that aren't in your file are greyed out. You can tick kinds on or off, and choose to Remove, Mask or Pseudonymize each one." },
+    { el: "#runBtn", title: "Anonymize",
+      text: "Click here to make the anonymized copies. You can compare before and after, then download them. Your files never leave this computer." },
+  ];
+  const tourEl = $("#tour"), pop = $("#tourPop"), spot = $("#tourSpot"), arrow = $("#tourArrow");
+  let tourAt = -1, tourReturnFocus = null;
+  const seenTour = () => { try { return localStorage.getItem(TOUR_KEY) === "1"; } catch (e) { return false; } };
+  const markTourSeen = () => { try { localStorage.setItem(TOUR_KEY, "1"); } catch (e) { /* private window: ignore */ } };
+
+  function placeTour() {
+    if (tourAt < 0) return;
+    const t = $(TOUR[tourAt].el); if (!t) return;
+    const vw = window.innerWidth, vh = window.innerHeight, pad = 8, gap = 16, m = 12;
+    const r = t.getBoundingClientRect();
+    const sx = Math.max(4, r.left - pad), sy = Math.max(4, r.top - pad);
+    const sw = Math.min(vw - 4, r.right + pad) - sx, sh = Math.min(vh - 4, r.bottom + pad) - sy;
+    Object.assign(spot.style, { left: sx + "px", top: sy + "px", width: sw + "px", height: sh + "px" });
+    const pw = pop.offsetWidth, ph = pop.offsetHeight;
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    let side, x, y;
+    if (sx + sw + gap + pw <= vw - m) side = "right";
+    else if (sy + sh + gap + ph <= vh - m) side = "bottom";
+    else if (sy - gap - ph >= m) side = "top";
+    else if (sx - gap - pw >= m) side = "left";
+    else side = "inside";
+    if (side === "right" || side === "left") {
+      x = side === "right" ? sx + sw + gap : sx - gap - pw;
+      y = clamp(r.top + r.height / 2 - ph / 2, m, vh - ph - m);
+      if (r.height > vh * 0.6) y = clamp(sy + 24, m, vh - ph - m);
+    } else if (side === "bottom" || side === "top") {
+      x = clamp(r.left + r.width / 2 - pw / 2, m, vw - pw - m);
+      y = side === "bottom" ? sy + sh + gap : sy - gap - ph;
+    } else { x = clamp(vw / 2 - pw / 2, m, vw - pw - m); y = vh - ph - m; }
+    pop.style.left = x + "px"; pop.style.top = y + "px";
+    // the arrow points at the middle of the highlighted area
+    arrow.hidden = side === "inside";
+    const a = arrow.style; a.left = a.top = a.right = a.bottom = "";
+    if (side === "right" || side === "left") {
+      const ay = clamp((side === "right" && r.height > vh * 0.6 ? sy + 48 : r.top + r.height / 2) - y - 8, 14, ph - 30);
+      a.top = ay + "px"; a[side === "right" ? "left" : "right"] = "-8px";
+    } else if (side !== "inside") {
+      const ax = clamp(r.left + r.width / 2 - x - 8, 14, pw - 30);
+      a.left = ax + "px"; a[side === "bottom" ? "top" : "bottom"] = "-8px";
+    }
+  }
+  function showTourStep(i) {
+    tourAt = i; const st = TOUR[i];
+    $("#tourStep").textContent = `Step ${i + 1} of ${TOUR.length}`;
+    $("#tourTitle").textContent = st.title;
+    $("#tourText").textContent = st.text;
+    $("#tourBack").hidden = i === 0;
+    $("#tourNext").textContent = i === TOUR.length - 1 ? "Got it" : "Next";
+    $("#tourDots").innerHTML = TOUR.map((_, k) => `<span class="${k === i ? "on" : ""}"></span>`).join("");
+    const t = $(st.el);
+    const r = t.getBoundingClientRect();
+    if (r.top < 0 || r.bottom > window.innerHeight) t.scrollIntoView({ block: r.height > window.innerHeight * 0.6 ? "start" : "center" });
+    requestAnimationFrame(() => { placeTour(); $("#tourNext").focus(); });
+  }
+  function startTour() {
+    if (state.busy) return;
+    tourReturnFocus = document.activeElement;
+    tourEl.hidden = false; showTourStep(0);
+  }
+  function endTour() {
+    tourEl.hidden = true; tourAt = -1; markTourSeen();
+    if (tourReturnFocus && tourReturnFocus.focus) tourReturnFocus.focus();
+  }
+  $("#tourNext").onclick = () => tourAt < TOUR.length - 1 ? showTourStep(tourAt + 1) : endTour();
+  $("#tourBack").onclick = () => tourAt > 0 && showTourStep(tourAt - 1);
+  $("#tourSkip").onclick = endTour;
+  $("#tourBtn").onclick = startTour;
+  tourEl.addEventListener("keydown", e => {
+    if (e.key === "Escape") { e.preventDefault(); endTour(); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); $("#tourNext").click(); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); $("#tourBack").click(); }
+    else if (e.key === "Tab") { // keep keyboard focus inside the tour box
+      const f = [...pop.querySelectorAll("button:not([hidden])")]; const k = f.indexOf(document.activeElement);
+      e.preventDefault(); f[(k + (e.shiftKey ? f.length - 1 : 1)) % f.length].focus();
+    }
+  });
+  window.addEventListener("resize", placeTour);
+  window.addEventListener("scroll", placeTour, true);
+
   setLevel(LEVELS.includes(state.level) ? state.level : "medium");
   renderFiles();
+  if (!seenTour()) setTimeout(startTour, 400);
 })();
 
 </script>

@@ -10,10 +10,10 @@ It is a one-time cleanup tool: drop files or a folder, pick a level, click **Ano
 
 ## Step by step
 
-1. Open `Hush.html` in Chrome or Edge (double-click it).
-2. Pick an **anonymization level**. The level sets which data types are ticked.
-3. Optionally tick data types on or off, and choose for each one whether to **remove**, **mask** or **pseudonymize** it.
-4. Drop files or a whole folder on the drop zone, or use **Choose files** / **Choose a folder**.
+1. Open `Hush.html` in Chrome or Edge (double-click it). The first time, a short tour shows you around. You can skip it, and replay it any time with **Show me around** at the top right.
+2. Drop files or a whole folder on the drop zone, or use **Choose files** / **Choose a folder**.
+3. Pick an **anonymization level**. The level sets which data types are ticked.
+4. Check **What gets anonymized**. Once you add files, Hush shows how often each data type was found in them, and greys out the types it didn't find. Tick data types on or off, and choose for each one whether to **remove**, **mask** or **pseudonymize** it.
 5. Click **Anonymize files**.
 6. Check the **Before and after** preview.
 7. Download each file, or **Download all (.zip)**, and **Download audit log (.csv)**.
