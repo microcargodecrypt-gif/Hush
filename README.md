@@ -8,6 +8,8 @@
 <p align="center"><strong>Anonymize documents on your own computer before they go into AI.</strong><br>
 Private by design · Runs in your browser and offline · Word, PDF, Excel · English, French, Dutch</p>
 
+<p align="center"><a href="https://microcargodecrypt-gif.github.io/Hush/"><strong>▶ Try it in your browser</strong></a></p>
+
 # Hush
 
 Remove personal data from your documents **on your own computer**, before you upload them to an AI tool.
@@ -29,7 +31,7 @@ Detection works in **English, French and Dutch**, with built-in support for Belg
 3. Choose a level, drop files or a whole folder, and click **Anonymize files**.
 4. Check the before/after preview, then download the files (one by one or as a .zip) and the audit log.
 
-You can also [try it online](#try-it-online) without downloading. It runs the same way: the files you drop are processed in your browser and are not uploaded.
+You can also [try it in your browser](https://microcargodecrypt-gif.github.io/Hush/) without downloading anything. It runs the same way: the files you drop are processed in your browser and are not uploaded.
 
 ## What it does
 
@@ -88,9 +90,9 @@ See [docs/configuration.md](docs/configuration.md).
 
 The full list of what is delivered, parked and still open is in the [requirements register](docs/requirements-register.md).
 
-## Try it online
+## Try it in your browser
 
-Once GitHub Pages is switched on, the tool is available at https://microcargodecrypt-gif.github.io/Hush/. The page is the same file as the download and is still blocked from sending data: your files are read by your browser and never uploaded.
+Hush is available online at **https://microcargodecrypt-gif.github.io/Hush/**. The page is the same file as the download and is still blocked from sending data: your files are read by your browser and never uploaded.
 
 ## Contributing
 
