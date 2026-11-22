@@ -33,6 +33,16 @@ Detection works in **English, French and Dutch**, with built-in support for Belg
 
 You can also [try it in your browser](https://microcargodecrypt-gif.github.io/Hush/) without downloading anything. It runs the same way: the files you drop are processed in your browser and are not uploaded.
 
+## Try it with sample documents
+
+Don't want to use your own files for a first try? The [`samples`](samples/) folder holds six made-up documents in English, French and Dutch: two Word files, two PDFs, an Excel list and a CSV. Everything in them is invented, but the ID, IBAN and VAT numbers pass the same checks as real ones.
+
+1. Download [all samples as a .zip](https://microcargodecrypt-gif.github.io/Hush/samples/hush-samples.zip) and unzip it.
+2. Open Hush, choose **Very high** and drop the files on the page.
+3. Click **Anonymize files** and compare the before and after preview.
+
+The [samples page](samples/README.md) lists what each file contains.
+
 ## What it does
 
 | | |

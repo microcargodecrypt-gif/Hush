@@ -1,0 +1,9 @@
+﻿order_id,order_date,customer_name,email,phone,billing_address,postcode,city,country,ip_address,card_number,order_total,vat_number,delivery_note
+10421,2026-10-02,Emily Hartley,emily.hartley@example.com,+44 7700 900456,22 Sample Street,,Oxford,United Kingdom,203.0.113.17,4111 1111 1111 1111,€ 64.90,,Leave with neighbour at number 24
+10422,2026-10-02,Julie Moreau,julie.moreau@example.fr,+33 1 99 00 12 34,Rue de l'Exemple 15,1000,Bruxelles,Belgium,198.51.100.88,5555 5555 5555 4444,€ 129.00,,
+10423,2026-10-03,Bart Van Acker,bart@vanacker.example.com,0470 00 22 03,Voorbeeldstraat 88,9000,Gent,Belgium,192.0.2.45,4012 8888 8888 1881,"€ 1,245.50",BE 0700.987.623,"Business order, invoice to company"
+10424,2026-10-04,Fatima Benali,f.benali@example.org,0470 00 22 04,Avenue des Exemples 40,1050,Ixelles,Belgium,203.0.113.201,3782 822463 10005,€ 38.50,,"Gift wrap, card signed by Nadia"
+10425,2026-10-05,Daniel Ashworth,daniel.ashworth@example.net,+44 20 7946 0321,7 Example Road,,London,United Kingdom,198.51.100.3,4111 1111 1111 1111,€ 89.99,,
+10426,2026-10-05,Elif Yilmaz,elif.yilmaz@example.com,0470 00 22 06,Proeflaan 6,3000,Leuven,Belgium,192.0.2.199,6011 1111 1111 1117,€ 212.40,,Call before delivery
+10427,2026-10-06,Marc Lemaire,marc.lemaire@example.be,+32 2 000 44 55,Chaussée de l'Exemple 210,1180,Uccle,Belgium,203.0.113.64,5555 5555 5555 4444,"€ 3,480.00",BE 0400.123.416,"Deliver to reception, ask for Marie Lemaire"
+10428,2026-10-07,Céline Dumont,celine.dumont@example.net,04 000 77 88,Rue des Essais 19,4000,Liège,Belgium,198.51.100.150,4012 8888 8888 1881,€ 17.95,,
