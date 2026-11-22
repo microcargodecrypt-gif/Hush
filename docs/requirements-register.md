@@ -9,6 +9,7 @@ This register is the single source of truth for what Hush does in MVP1 and what 
 Each requirement has one status:
 
 - **Delivered (MVP1):** built and working.
+- **Delivered (MVP2):** built and working, added after MVP1.
 - **Partial (MVP1):** built, with a known gap described in the note.
 - **Parked for MVP2:** agreed, deliberately postponed.
 - **To decide:** a known gap or idea that has no MVP assigned yet.
@@ -18,12 +19,13 @@ Whenever a requirement is added, changed, parked or dropped, update this registe
 
 ## Summary
 
-Of 33 requirements, 17 were delivered in MVP1 and 2 partly, 7 are parked for MVP2, and 7 still need a decision.
+Of 35 requirements, 17 were delivered in MVP1 and 2 partly, 2 have been delivered since, 7 are parked for MVP2, and 7 still need a decision.
 
 | Status | Count | IDs |
 | --- | --- | --- |
 | Delivered (MVP1) | 17 | R-01 to R-05, R-07 to R-16, R-18, R-19 |
 | Partial (MVP1) | 2 | R-06, R-17 |
+| Delivered (MVP2) | 2 | R-34, R-35 |
 | Parked for MVP2 | 7 | R-20 to R-26 |
 | To decide | 7 | R-27 to R-33 |
 | Dropped | 0 |  |
@@ -65,6 +67,8 @@ Of 33 requirements, 17 were delivered in MVP1 and 2 partly, 7 are parked for MVP
 | R-31 | Review step to accept or reject each detection before export | Interface | To decide |  | Idea raised by Claude |
 | R-32 | "Always" and "never" anonymize word lists (for example organisation or project names) | Settings | To decide |  | Idea raised by Claude |
 | R-33 | Realistic fake values as a fourth method | Pseudonyms | To decide |  | Idea raised by Claude |
+| R-34 | Short guided tour on first visit | Interface | Delivered (MVP2) | 22 Nov 2026 | Four steps: add a file, choose a level, check what gets hidden, anonymize. Skip at any time; replay with "Show me around". Remembered in the browser |
+| R-35 | "What gets anonymized" list appears after a file is added, with counts | Interface | Delivered (MVP2) | 22 Nov 2026 | A quick scan shows how often each type was found; types not found are greyed out but stay usable. 5,000 rows scanned in under half a second |
 
 ## Change log
 
@@ -72,3 +76,4 @@ Of 33 requirements, 17 were delivered in MVP1 and 2 partly, 7 are parked for MVP
 | --- | --- |
 | 30 Oct 2026 | Register created: 17 delivered, 2 partial, 7 parked for MVP2, 7 to decide. This version is the MVP1 snapshot. |
 | 22 Nov 2026 | Reworded as a general-purpose tool ahead of open-sourcing. No requirement changed. |
+| 22 Nov 2026 | Added R-34 (guided tour) and R-35 (data list after upload, with counts), both delivered. New status: Delivered (MVP2). |
